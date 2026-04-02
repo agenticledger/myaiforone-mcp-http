@@ -51,7 +51,7 @@ server.tool("get_agent_instructions", "Get an agent's CLAUDE.md system prompt", 
 server.tool("create_agent", "Create a new agent with full configuration", {
   agentId: z.string().describe("Unique agent ID (lowercase, hyphens)"),
   name: z.string().describe("Display name"),
-  alias: z.string().describe("Mention alias (e.g. @myagent)"),
+  alias: z.string().optional().describe("Mention alias (e.g. @myagent)"),
   claudeMd: z.string().describe("System prompt / CLAUDE.md content for this agent"),
   description: z.string().optional().describe("Agent description"),
   workspace: z.string().optional().describe("Working directory path"),
