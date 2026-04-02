@@ -651,18 +651,52 @@ server.tool("get_sticky_routing", "Get sticky routing config for all channels", 
 //  ADDITIONAL REGISTRY
 // ═══════════════════════════════════════════════════════════════════
 
-server.tool("install_registry_item", "Install a skill/MCP/agent from the registry", {
-  id: z.string().describe("Registry item ID"),
-  type: z.string().describe("Item type: skill, mcp, agent, prompt"),
-}, async ({ id, type }) => {
-  const r = await api.installMarketplace(id, type);
+server.tool("install_skill", "Add a skill to the company library (upserts by name)", {
+  name: z.string().describe("Skill name"),
+  content: z.string().describe("Skill markdown content / instructions"),
+  description: z.string().optional().describe("One-line description"),
+  category: z.string().optional().describe("Category tag (e.g. accounting, engineering)"),
+}, async (args) => {
+  const r = await api.installMarketplace("", "skill", args);
   return { content: [{ type: "text", text: JSON.stringify(r, null, 2) }] };
 });
 
-server.tool("assign_to_agent", "Assign a skill or MCP to an agent", {
-  agentId: z.string(), itemId: z.string(), type: z.string().describe("skill or mcp"),
+server.tool("install_prompt", "Add a prompt template to the company library (upserts by name)", {
+  name: z.string().describe("Prompt name (used as !name trigger)"),
+  content: z.string().describe("Prompt template content"),
+  description: z.string().optional().describe("One-line description"),
+}, async (args) => {
+  const r = await api.installMarketplace("", "prompt", args);
+  return { content: [{ type: "text", text: JSON.stringify(r, null, 2) }] };
+});
+
+server.tool("install_registry_item", "Install or upsert any item type into the company library", {
+  type: z.string().describe("Item type: skill | prompt"),
+  id: z.string().optional().describe("Existing item ID (marks as installed if already present)"),
+  name: z.string().optional().describe("Name (required when creating a new item)"),
+  content: z.string().optional().describe("Content/body (required for skill or prompt)"),
+  description: z.string().optional(),
+  category: z.string().optional(),
+}, async (args) => {
+  const r = await api.installMarketplace(args.id ?? "", args.type, args);
+  return { content: [{ type: "text", text: JSON.stringify(r, null, 2) }] };
+});
+
+server.tool("assign_to_agent", "Assign a skill or MCP to one or more agents", {
+  agentId: z.string().describe("Agent ID or slug (single agent)"),
+  itemId: z.string().describe("Skill or MCP ID"),
+  type: z.string().describe("skill or mcp"),
 }, async ({ agentId, itemId, type }) => {
   const r = await api.assignToAgent(agentId, itemId, type);
+  return { content: [{ type: "text", text: JSON.stringify(r, null, 2) }] };
+});
+
+server.tool("assign_to_agents", "Assign a skill or MCP to multiple agents at once", {
+  agentIds: z.array(z.string()).describe("Array of agent IDs or slugs"),
+  itemId: z.string().describe("Skill or MCP ID"),
+  type: z.string().describe("skill or mcp"),
+}, async ({ agentIds, itemId, type }) => {
+  const r = await api.assignToAgents(agentIds, itemId, type);
   return { content: [{ type: "text", text: JSON.stringify(r, null, 2) }] };
 });
 

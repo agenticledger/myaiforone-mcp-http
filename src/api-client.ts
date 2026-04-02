@@ -150,10 +150,12 @@ export const stickyRouting = () => api("/api/sticky-routing");
 
 // ─── Registry / Marketplace ───────────────────────────────────────
 export const marketplace = (type: string) => api(`/api/marketplace/${type}`);
-export const installMarketplace = (id: string, type: string) =>
-  api("/api/marketplace/install", { method: "POST", body: { id, type } });
+export const installMarketplace = (id: string, type: string, extra?: Record<string, unknown>) =>
+  api("/api/marketplace/install", { method: "POST", body: { id, type, ...extra } });
 export const assignToAgent = (agentId: string, itemId: string, type: string) =>
   api("/api/marketplace/assign", { method: "POST", body: { agentIds: [agentId], id: itemId, type } });
+export const assignToAgents = (agentIds: string[], itemId: string, type: string) =>
+  api("/api/marketplace/assign", { method: "POST", body: { agentIds, id: itemId, type } });
 
 // ─── Apps ─────────────────────────────────────────────────────────
 export const listApps = () => api("/api/apps");
