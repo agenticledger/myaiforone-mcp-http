@@ -75,6 +75,11 @@ app.get("/", (_req, res) => {
   });
 });
 
+// ─── Health check ────────────────────────────────────────────────────
+app.get("/health", (_req, res) => {
+  res.json({ status: "ok", auth: "dual-mode", auth_modes: ["bearer", "oauth2-client-credentials"] });
+});
+
 // ─── OAuth 2.0 Discovery ─────────────────────────────────────────────
 app.get("/.well-known/oauth-authorization-server", (_req, res) => {
   res.json({
